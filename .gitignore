@@ -1,0 +1,40 @@
+# 執行檔和編譯中間檔案
+/myproject
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.out
+
+# 編譯過程生成的目錄
+/build/
+/bin/
+/pkg/
+
+# 暫存檔案和日誌
+*.log
+*.tmp
+*.swp
+
+# 環境變數檔案
+.env
+.env.*
+
+# IDE 和系統暫存檔案
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Go Modules 生成的依賴檔案
+vendor/
+
+# Docker 和容器化相關
+docker-compose.override.yml
+
+# config 靜態配置（可根據需求調整）
+config/app.yaml
+config/env/
