@@ -2,13 +2,22 @@ package main
 
 import (
 	"discord-automod/config"
-	"fmt"
+	"discord-automod/internal/bot"
+	"log"
 )
 
 func main() {
 	config.InitConfig()
 
-	fmt.Println("Hello, World!")
-	fmt.Println("Config:", config.Cfg.Debug)
-	fmt.Println("Config:", config.Cfg.Token)
+	botToken := config.Cfg.Token
+
+	b, err := bot.NewBot(botToken)
+	if err != nil {
+		log.Fatalf("Failed to initialize bot: %v", err)
+	}
+
+	err = b.Start()
+	if err != nil {
+		log.Fatalf("Error running bot: %v", err)
+	}
 }

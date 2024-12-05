@@ -1,38 +1,50 @@
 package bot
 
 import (
+	"discord-automod/internal/bot/cogs"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 
-	"discord-automod/internal/bot/cogs"
-
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	BotToken string = os.Getenv("TOKEN")
-)
+type Bot struct {
+	Discord *discordgo.Session
+}
 
-func Run(sid string, pwd string) {
-	discord, err := discordgo.New("Bot " + BotToken)
+func NewBot(token string) (*Bot, error) {
+	discord, err := discordgo.New("Bot " + token)
+
 	if err != nil {
-		log.Fatal(err)
-		return
+		return nil, fmt.Errorf("failed to create Discord session: %w", err)
 	}
 
-	// Add event handler
-	discord.AddHandler(cogs.NewMessage)
+	return &Bot{Discord: discord}, nil
+}
 
-	// Open session
-	discord.Open()
-	defer discord.Close()
+func (b *Bot) Start() error {
+	b.Discord.AddHandler(cogs.NewMessage)
 
-	// Run until code is terminated
-	fmt.Println("Bot running...")
+	err := b.Discord.Open()
+	if err != nil {
+		return fmt.Errorf("failed to open Discord session: %w", err)
+	}
+	defer b.Stop()
+
+	log.Println("Bot is running... Press CTRL+C to exit.")
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
 
+	log.Println("Shutting down bot gracefully...")
+	return nil
+}
+
+func (b *Bot) Stop() {
+	if b.Discord != nil {
+		b.Discord.Close()
+	}
 }
