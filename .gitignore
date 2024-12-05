@@ -21,6 +21,7 @@
 # 環境變數檔案
 .env
 .env.*
+!.env.example
 
 # IDE 和系統暫存檔案
 .idea/

@@ -14,6 +14,8 @@ type Bot struct {
 	Discord *discordgo.Session
 }
 
+var filterFilePath = "config/banned_words.txt"
+
 func NewBot(token string) (*Bot, error) {
 	discord, err := discordgo.New("Bot " + token)
 
@@ -25,9 +27,13 @@ func NewBot(token string) (*Bot, error) {
 }
 
 func (b *Bot) Start() error {
+	err := cogs.InitFilter(filterFilePath)
+	if err != nil {
+		return err
+	}
 	b.Discord.AddHandler(cogs.NewMessage)
 
-	err := b.Discord.Open()
+	err = b.Discord.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open Discord session: %w", err)
 	}

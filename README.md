@@ -17,9 +17,13 @@ go mod tidy
 go run ./cmd/main.go
 ```
 
+### 設定
+
+複製`.env.example`檔案為`.env`，並填入必要的環境變數。
+
 ## 功能
 
-尚無完成功能
+- 自動timeout那些很喜歡 `@everyone` 的人
 
 ## TODO
 
