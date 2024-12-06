@@ -4,6 +4,8 @@ name="automod-bot"
 
 TOKEN=${TOKEN:-$(read -p "Enter TOKEN: " token && echo "$token")}
 
+chmod 777 config/banned_words.txt
+
 docker build \
     --build-arg TOKEN="$TOKEN" \
     $@ -t $user/$name:latest . || exit
@@ -17,4 +19,5 @@ docker run \
 	--name $name \
     --network host \
 	--restart=always \
+	--volume $(pwd)/config/banned_words.txt:/app/config/banned_words.txt \
 	$user/$name:latest

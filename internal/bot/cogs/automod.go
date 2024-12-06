@@ -38,6 +38,12 @@ func NewMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
+	// Check if the message is a command
+	if strings.HasPrefix(content, "!delban ") {
+		handleDelBanCommand(discord, message, content)
+		return
+	}
+
 	// Iterate all Banned Word in filter
 	words := strings.Fields(strings.ToLower(message.Content))
 	for _, word := range words {
@@ -85,4 +91,25 @@ func handleAddBanCommand(session *discordgo.Session, message *discordgo.MessageC
 	}
 
 	session.ChannelMessageSend(message.ChannelID, "成功新增禁用字詞："+word)
+}
+
+func handleDelBanCommand(session *discordgo.Session, message *discordgo.MessageCreate, content string) {
+	parts := strings.SplitN(content, " ", 2)
+	if len(parts) != 2 {
+		session.ChannelMessageSend(message.ChannelID, "用法錯誤，請使用 `!delban <word>`")
+		return
+	}
+	word := strings.TrimSpace(parts[1])
+	if word == "" {
+		session.ChannelMessageSend(message.ChannelID, "請提供有效的禁用字詞。")
+		return
+	}
+
+	err := filter.DeleteBannedWord(word)
+	if err != nil {
+		session.ChannelMessageSend(message.ChannelID, "無法刪除禁用字詞："+err.Error())
+		return
+	}
+
+	session.ChannelMessageSend(message.ChannelID, "成功刪除禁用字詞："+word)
 }

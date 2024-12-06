@@ -82,3 +82,44 @@ func (wf *WordFilter) AddBannedWord(word string) error {
 
 	return nil
 }
+
+// Delete Banned Word
+func (wf *WordFilter) DeleteBannedWord(word string) error {
+	word = strings.ToLower(strings.TrimSpace(word))
+	if word == "" {
+		return fmt.Errorf("cannot delete an empty word")
+	}
+	wf.mu.Lock()
+	defer wf.mu.Unlock()
+	if _, exists := wf.bannedWords[word]; !exists {
+		return fmt.Errorf("word not banned: %s", word)
+	}
+	delete(wf.bannedWords, word)
+
+	// write to file
+	file, err := os.OpenFile(wf.filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to update banned words file: %w", err)
+	}
+	defer file.Close()
+	lines := []string{}
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line != word {
+			lines = append(lines, line)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+	file.Truncate(0)
+	file.Seek(0, 0)
+	for _, line := range lines {
+		_, err = file.WriteString(line + "\n")
+		if err != nil {
+			return fmt.Errorf("failed to write to file: %w", err)
+		}
+	}
+	return nil
+}

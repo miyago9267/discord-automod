@@ -20,7 +20,6 @@ ENV PRIFIX="!" \
 ENV TOKEN=${TOKEN}
 
 COPY --from=builder /app/main .
-COPY /config/banned_words.txt /app/config/banned_words.txt
 COPY .env /app/.env
 
 RUN chmod +x ./main
