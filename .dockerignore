@@ -3,8 +3,6 @@
 .gitignore
 
 # 忽略本地環境配置文件
-.env
-.env.*
 
 # 忽略 IDE 和編輯器的暫存文件
 .idea/

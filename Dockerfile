@@ -1,25 +1,27 @@
-FROM golang:1.23 AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
+
+RUN apk add --no-cache gcc musl-dev
 
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 
-RUN go build -o main ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/main.go
 
-FROM debian:bullseye-slim
+FROM alpine:latest
 
 WORKDIR /app
 
 ARG TOKEN
-ENV ENV=prd \
-    PRIFIX="!" \
+ENV PRIFIX="!" \
     DEBUG=false
 ENV TOKEN=${TOKEN}
 
 COPY --from=builder /app/main .
 COPY /config/banned_words.txt /app/config/banned_words.txt
+COPY .env /app/.env
 
 RUN chmod +x ./main
 
